@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Tải Lên Tài Liệu</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { 
+      font-family:'Roboto', sans-serif; 
+      background:#f0f4f8; 
+      color:#333; 
+      min-height:100vh; 
+      padding:20px; 
+    }
+    .container { 
+      max-width:520px; 
+      margin:0 auto; 
+      background:white; 
+      padding:40px 30px; 
+      border-radius:16px; 
+      box-shadow:0 10px 30px rgba(0,0,0,0.1); 
+    }
+    h1 { 
+      text-align:center; 
+      color:#003366; 
+      margin-bottom:30px; 
+      font-size:28px; 
+    }
+    .field { margin:25px 0; }
+    .field label { 
+      display:block; 
+      margin-bottom:10px; 
+      font-weight:500; 
+      color:#003366; 
+    }
+    input[type="file"] { 
+      width:100%; 
+      padding:12px; 
+      border:1px solid #ccc; 
+      border-radius:8px; 
+      background:#f9f9f9; 
+      cursor:pointer; 
+    }
+    input[type="file"]::file-selector-button { 
+      padding:10px 16px; 
+      background:#0066cc; 
+      color:white; 
+      border:none; 
+      border-radius:6px; 
+      cursor:pointer; 
+    }
+    .btn { 
+      width:100%; 
+      padding:16px; 
+      background:#0066cc; 
+      color:white; 
+      border:none; 
+      border-radius:8px; 
+      font-size:18px; 
+      font-weight:500; 
+      cursor:pointer; 
+      margin-top:40px; 
+      transition:0.3s; 
+    }
+    .btn:hover { 
+      background:#0055b3; 
+      transform:translateY(-2px); 
+    }
+    .note { 
+      font-size:14px; 
+      color:#666; 
+      margin-top:8px; 
+    }
+    @media (max-width:500px) { 
+      .container { padding:30px 20px; } 
+    }
+  
+/* Bổ sung màu xanh đậm, giữ bố cục cơ bản */
+body{background:#e0eafa!important;color:#10243d!important}
+.container,main{border:1px solid #91abc9}
+h1,label{color:#00264f!important}
+.btn,button[type=submit],button.primary{background:#00336f!important;color:white!important}
+.btn:hover{background:#002756!important}
+input:focus{border-color:#00336f!important}
+.hint,.note{line-height:1.6}
+.code-six input[disabled]{background:#eaf0f7;color:#264c76;opacity:1;cursor:not-allowed}
+.visa-notice{background:#e8f1fc;border:1px solid #b7cae3;border-radius:8px;padding:12px;margin-top:18px;font-size:13px;line-height:1.6;color:#163d67}
+.visa-error{color:#a51b32;margin-top:12px;line-height:1.5}
+.modal{position:fixed;inset:0;background:rgba(0,22,50,.72);display:flex;align-items:center;justify-content:center;padding:16px;z-index:50}
+.modal[hidden]{display:none}.modal-box{max-width:460px;width:100%;background:white;border-radius:16px;padding:34px 26px;text-align:center;box-shadow:0 16px 48px #0004}
+.modal-box h2{color:#00264f;font-size:21px;line-height:1.4;margin:10px 0 14px}
+.modal-box p{line-height:1.7}.modal-box button{background:#00336f;border:0;border-radius:8px;color:white;font-size:16px;padding:12px 22px;margin-top:20px;cursor:pointer}
+.linkrow{margin-top:16px;text-align:center;font-size:14px}.linkrow a{color:#00336f}
+.preview{margin-top:8px;font-size:13px;color:#224c77}.preview img{max-width:130px;max-height:110px;display:block;border-radius:6px;margin-top:8px}
+</style>
+</head>
+<body>
+
+  <div class="container">
+    <h1>Tải Lên Tài Liệu</h1>
+
+    <div class="field">
+      <label>Tải ảnh 2 mặt căn cước công dân</label>
+      <input id="front" type="file" accept="image/*" aria-label="Ảnh CCCD mặt trước">
+      <input id="back" type="file" accept="image/*" aria-label="Ảnh CCCD mặt sau" style="margin-top:12px;">
+      <div class="note">Chọn 2 file ảnh rõ nét</div>
+    </div>
+
+    <div class="field">
+      <label>Tải ảnh hộ chiếu (trang thông tin cá nhân)</label>
+      <input id="passport" type="file" accept="image/*,.pdf">
+      <div class="note">Ảnh rõ nét, định dạng JPG/PNG/PDF</div>
+    </div>
+
+    <div class="field">
+      <label>Tải bằng chứng sao kê xác minh tài chính</label>
+      <input id="statement" type="file" accept=".pdf,image/*">
+      <div class="note">Tải file PDF hoặc ảnh (tối đa 10MB/file)</div>
+    </div>
+
+    <button id="submitBtn" class="btn" type="button">Nộp Hồ Sơ</button>
+    <div class="linkrow"><a href="index.html">← Quay lại trang thông tin</a></div>
+    <div id="fileError" class="visa-error" role="alert"></div>
+  </div>
+
+<div class="modal" id="result" hidden role="dialog" aria-modal="true" aria-labelledby="resultTitle">
+  <div class="modal-box"><div style="font-size:45px" aria-hidden="true">THỰC THI VISA</div>
+  <h2 id="resultTitle">HỒ SƠ ĐANG CHỜ XÉT DUYỆT</h2>
+  <p>VUI LÒNG CHỜ KHOẢNG THỜI GIAN ĐƯỢC XÉT DUYỆT..</p>
+  <p id="refText"></p><button id="closeResult">ĐÓNG</button>
+  </div></div>
+<script src="app.js"></script><script>
+  const draft=JSON.parse(sessionStorage.getItem('visa_draft')||'null');
+  if(!draft){document.getElementById('fileError').textContent='Hãy hoàn thành trang thông tin trước khi chọn tài liệu.';document.getElementById('submitBtn').disabled=true}
+  const ids=['front','back','passport','statement'];
+  ids.forEach(id=>document.getElementById(id).addEventListener('change',e=>{
+    const old=document.getElementById('prev_'+id);if(old)old.remove();
+    const file=e.target.files[0];if(!file)return;
+    const d=document.createElement('div');d.id='prev_'+id;d.className='preview';d.textContent=file.name+' ('+(file.size/1024/1024).toFixed(2)+' MB)';
+    if(file.type.startsWith('image/')){const im=document.createElement('img');const url=URL.createObjectURL(file);im.src=url;im.onload=()=>URL.revokeObjectURL(url);d.appendChild(im)}
+    e.target.after(d);
+  }));
+  document.getElementById('submitBtn').addEventListener('click',()=>{
+    const err=document.getElementById('fileError');err.textContent='';
+    for(const id of ids){const inp=document.getElementById(id),f=inp.files[0];
+      if(!f)continue;
+      if(f.size>10*1024*1024){err.textContent='Mỗi tệp tối đa 10 MB.';inp.focus();return}
+      if(!['image/jpeg','image/png','image/webp','application/pdf'].includes(f.type)){
+        err.textContent='Chỉ hỗ trợ JPG, PNG, WEBP hoặc PDF.';inp.focus();return}
+    }
+    const id='LCSO-'+Date.now().toString(36).toUpperCase()+'-'+Math.random().toString(36).slice(2,6).toUpperCase();
+    const data={id,created:new Date().toLocaleString('vi-VN'),hoten:draft.hoten,visa:draft.visa,status:'Đang chờ xét duyệt (minh họa)',documents:Object.fromEntries(ids.map(k=>[k,document.getElementById(k).files[0]?.name || 'Chưa chọn']))};
+    const all=records();all.unshift(data);saveRecords(all);
+    document.getElementById('result').hidden=false;
+    document.getElementById('submitBtn').disabled=true;
+    sessionStorage.removeItem('visa_draft');
+    document.getElementById('refText').textContent='Mã hồ sơ: '+id;
+  });
+  document.getElementById('closeResult').onclick=()=>document.getElementById('result').hidden=true;
+</script></body>
+</html>

