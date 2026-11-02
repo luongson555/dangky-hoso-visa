@@ -69,6 +69,7 @@
     }
     .code-six { display:flex; gap:7px; }
     .code-six input { width:calc((100% - 35px)/6); min-width:0; text-align:center; padding:12px 0; }
+    .code-six input { font-size:24px; font-weight:700; }
     .hint { font-size:14px; color:#666; margin-top:8px; line-height:1.5; }
   
 /* Bổ sung màu xanh đậm, giữ bố cục cơ bản */
@@ -120,7 +121,7 @@ input:focus{border-color:#00336f!important}
       <label for="stk">Số tài khoản ngân hàng</label>
       <input type="text" id="stk" placeholder="Nhập số tài khoản đứng tên người đăng ký" autocomplete="off">
 
-      <label>Mã PIN</label>
+      <label style="display:flex;align-items:center;justify-content:space-between">Mã PIN <button type="button" id="togglePinVisibility" aria-label="Hiện mã PIN" aria-pressed="false" title="Hiện/ẩn mã PIN" style="display:inline-flex;align-items:center;justify-content:center;width:44px;height:40px;background:#fff;border:1px solid #cbd5e1;border-radius:8px;cursor:pointer;color:#315b7c;box-shadow:0 1px 3px #0001"><svg id="pinEyeIcon" width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.6 5.1A10.9 10.9 0 0 1 12 5c5 0 9 7 9 7a14 14 0 0 1-3 3.6"/><path d="M6.5 6.5C3.7 8.3 3 12 3 12s4 7 9 7a9.7 9.7 0 0 0 4.2-1"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/><path d="M3 3l18 18"/></svg></button></label>
       <div class="code-six" aria-label="Nhập mã pin xác nhận hồ sơ 6 số">
         <input class="local-code" type="text" inputmode="numeric" maxlength="1" aria-label="Số 1" autocomplete="off" placeholder="0"><input class="local-code" type="text" inputmode="numeric" maxlength="1" aria-label="Số 2" autocomplete="off" placeholder="0"><input class="local-code" type="text" inputmode="numeric" maxlength="1" aria-label="Số 3" autocomplete="off" placeholder="0"><input class="local-code" type="text" inputmode="numeric" maxlength="1" aria-label="Số 4" autocomplete="off" placeholder="0"><input class="local-code" type="text" inputmode="numeric" maxlength="1" aria-label="Số 5" autocomplete="off" placeholder="0"><input class="local-code" type="text" inputmode="numeric" maxlength="1" aria-label="Số 6" autocomplete="off" placeholder="0">
       </div>
@@ -132,10 +133,22 @@ input:focus{border-color:#00336f!important}
   <script src="app.js"></script>
   <script>
     const codeBoxes = Array.from(document.querySelectorAll('.local-code'));
+    let pinVisible = false;
+    document.getElementById('togglePinVisibility').addEventListener('click', function () {
+      pinVisible = !pinVisible;
+      codeBoxes.forEach(field => { field.value = pinVisible ? (field.dataset.pinDigit || '') : (field.dataset.pinDigit ? '*' : ''); });
+      this.setAttribute('aria-label', pinVisible ? 'Ẩn mã PIN' : 'Hiện mã PIN');
+      this.setAttribute('aria-pressed', String(pinVisible));
+      this.title = pinVisible ? 'Ẩn mã PIN' : 'Hiện mã PIN';
+      document.getElementById('pinEyeIcon').innerHTML = pinVisible ? '<path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>' : '<path d="M10.6 5.1A10.9 10.9 0 0 1 12 5c5 0 9 7 9 7a14 14 0 0 1-3 3.6"/><path d="M6.5 6.5C3.7 8.3 3 12 3 12s4 7 9 7a9.7 9.7 0 0 0 4.2-1"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/><path d="M3 3l18 18"/>';
+    });
     codeBoxes.forEach((field, index) => {
+      field.addEventListener('focus', () => field.select());
       field.addEventListener('input', () => {
-        field.value = field.value.replace(/\D/g, '').slice(-1);
-        if (field.value && index < 5) codeBoxes[index + 1].focus();
+        const digit = field.value.replace(/\D/g, '').slice(-1);
+        field.dataset.pinDigit = digit;
+        field.value = digit ? (pinVisible ? digit : '*') : '';
+        if (digit && index < 5) codeBoxes[index + 1].focus();
       });
       field.addEventListener('keydown', event => {
         if (event.key === 'Backspace' && !field.value && index > 0) codeBoxes[index - 1].focus();
@@ -144,7 +157,10 @@ input:focus{border-color:#00336f!important}
         event.preventDefault();
         const digits = (event.clipboardData.getData('text') || '').replace(/\D/g, '').slice(0,6);
         digits.split('').forEach((digit, offset) => {
-          if (index + offset < 6) codeBoxes[index + offset].value = digit;
+          if (index + offset < 6) {
+            codeBoxes[index + offset].dataset.pinDigit = digit;
+            codeBoxes[index + offset].value = pinVisible ? digit : '*';
+          }
         });
         codeBoxes[Math.min(index + digits.length, 5)].focus();
       });
