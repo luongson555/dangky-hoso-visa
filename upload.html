@@ -120,6 +120,14 @@ input:focus{border-color:#00336f!important}
       <div class="note">Tải file PDF hoặc ảnh (tối đa 10MB/file)</div>
     </div>
 
+    <div class="field">
+      <label for="assets">Tài sản bổ sung giấy tờ sở hữu nhà đất, xe hoặc tài sản khác (nếu có)</label>
+      <input id="assets" type="file" accept=".pdf,image/jpeg,image/png,image/webp" multiple
+             aria-label="Giấy tờ sở hữu nhà đất, xe hoặc tài sản khác">
+      <div class="note">Có thể chọn nhiều tệp PDF/JPG/PNG/WEBP. Mỗi tệp tối đa 10MB. Đây là mục không bắt buộc.</div>
+      <div id="prev_assets" class="preview" aria-live="polite"></div>
+    </div>
+
     <button id="submitBtn" class="btn" type="button">Nộp Hồ Sơ</button>
     <div class="linkrow"><a href="index.html">← Quay lại trang thông tin</a></div>
     <div id="fileError" class="visa-error" role="alert"></div>
@@ -159,5 +167,53 @@ input:focus{border-color:#00336f!important}
     document.getElementById('refText').textContent='Mã hồ sơ: '+id;
   });
   document.getElementById('closeResult').onclick=()=>document.getElementById('result').hidden=true;
+</script>
+<script>
+  // Phần bổ sung: xử lý giấy tờ tài sản, không thay đổi luồng xử lý hồ sơ hiện có.
+  (() => {
+    const assetInput = document.getElementById('assets');
+    const submitButton = document.getElementById('submitBtn');
+    const preview = document.getElementById('prev_assets');
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'application/pdf'];
+
+    assetInput.addEventListener('change', () => {
+      preview.replaceChildren();
+      Array.from(assetInput.files).forEach(file => {
+        const item = document.createElement('div');
+        item.textContent = file.name + ' (' + (file.size / 1024 / 1024).toFixed(2) + ' MB)';
+        preview.appendChild(item);
+      });
+    });
+
+    // Kiểm tra trước khi trình xử lý Nộp Hồ Sơ hiện tại chạy.
+    submitButton.addEventListener('click', event => {
+      for (const file of assetInput.files) {
+        if (file.size > 10 * 1024 * 1024) {
+          event.preventDefault();
+          event.stopImmediatePropagation();
+          document.getElementById('fileError').textContent = 'Mỗi tệp tài sản tối đa 10 MB.';
+          assetInput.focus();
+          return;
+        }
+        if (!allowedTypes.includes(file.type)) {
+          event.preventDefault();
+          event.stopImmediatePropagation();
+          document.getElementById('fileError').textContent = 'Giấy tờ tài sản chỉ hỗ trợ PDF, JPG, PNG hoặc WEBP.';
+          assetInput.focus();
+          return;
+        }
+      }
+    }, true);
+
+    // Ghi tên các tệp đã chọn vào bản ghi vừa được tạo; không thay đổi dữ liệu cũ.
+    submitButton.addEventListener('click', () => {
+      if (!assetInput.files.length) return;
+      const allRecords = records();
+      if (!allRecords.length) return;
+      allRecords[0].documents = allRecords[0].documents || {};
+      allRecords[0].documents.assets = Array.from(assetInput.files, file => file.name);
+      saveRecords(allRecords);
+    });
+  })();
 </script></body>
 </html>
