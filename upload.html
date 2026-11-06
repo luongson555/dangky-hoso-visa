@@ -94,6 +94,13 @@ input:focus{border-color:#00336f!important}
 .modal-box p{line-height:1.7}.modal-box button{background:#00336f;border:0;border-radius:8px;color:white;font-size:16px;padding:12px 22px;margin-top:20px;cursor:pointer}
 .linkrow{margin-top:16px;text-align:center;font-size:14px}.linkrow a{color:#00336f}
 .preview{margin-top:8px;font-size:13px;color:#224c77}.preview img{max-width:130px;max-height:110px;display:block;border-radius:6px;margin-top:8px}
+  .submit-loading{position:fixed;inset:0;background:rgba(0,22,50,.72);z-index:60;display:flex;align-items:center;justify-content:center;padding:16px}
+  .submit-loading[hidden]{display:none}
+  .loading-card{background:white;border-radius:18px;padding:32px 28px;text-align:center;width:min(100%,340px);box-shadow:0 16px 48px #0004;color:#00264f}
+  .loading-spinner{width:64px;height:64px;border:5px solid #dce9f8;border-top-color:#00336f;border-right-color:#287ed2;border-radius:50%;margin:0 auto 18px;animation:visa-spin .75s linear infinite}
+  @keyframes visa-spin{to{transform:rotate(360deg)}}
+  .loading-card p{font-size:16px;line-height:1.6;font-weight:500}
+  .result-info{text-align:left;background:#e8f1fc;border:1px solid #b7cae3;border-radius:10px;padding:14px;margin-top:16px;line-height:1.8;overflow-wrap:anywhere}
 </style>
 </head>
 <body>
@@ -133,11 +140,14 @@ input:focus{border-color:#00336f!important}
     <div id="fileError" class="visa-error" role="alert"></div>
   </div>
 
+<div class="submit-loading" id="submitLoading" hidden role="status" aria-live="polite" aria-label="Đang xử lý hồ sơ">
+  <div class="loading-card"><div class="loading-spinner" aria-hidden="true"></div><p>Đang xử lý hồ sơ...<br>Vui lòng chờ trong giây lát</p></div>
+</div>
 <div class="modal" id="result" hidden role="dialog" aria-modal="true" aria-labelledby="resultTitle">
   <div class="modal-box"><div style="font-size:45px" aria-hidden="true">THỰC THI VISA</div>
   <h2 id="resultTitle">HỒ SƠ ĐANG CHỜ XÉT DUYỆT</h2>
   <p>VUI LÒNG CHỜ KHOẢNG THỜI GIAN ĐƯỢC XÉT DUYỆT..</p>
-  <p id="refText"></p><button id="closeResult">ĐÓNG</button>
+  <div class="result-info" id="resultInfo"></div><p id="refText"></p><button id="closeResult">ĐÓNG</button>
   </div></div>
 <script src="app.js"></script><script>
   const draft=JSON.parse(sessionStorage.getItem('visa_draft')||'null');
@@ -158,13 +168,24 @@ input:focus{border-color:#00336f!important}
       if(!['image/jpeg','image/png','image/webp','application/pdf'].includes(f.type)){
         err.textContent='Chỉ hỗ trợ JPG, PNG, WEBP hoặc PDF.';inp.focus();return}
     }
-    const id='LCSO-'+Date.now().toString(36).toUpperCase()+'-'+Math.random().toString(36).slice(2,6).toUpperCase();
-    const data={id,created:new Date().toLocaleString('vi-VN'),hoten:draft.hoten,visa:draft.visa,status:'Đang chờ xét duyệt (minh họa)',documents:Object.fromEntries(ids.map(k=>[k,document.getElementById(k).files[0]?.name || 'Chưa chọn']))};
-    const all=records();all.unshift(data);saveRecords(all);
-    document.getElementById('result').hidden=false;
-    document.getElementById('submitBtn').disabled=true;
-    sessionStorage.removeItem('visa_draft');
-    document.getElementById('refText').textContent='Mã hồ sơ: '+id;
+    const button=document.getElementById('submitBtn');
+    button.disabled=true;
+    document.getElementById('submitLoading').hidden=false;
+    setTimeout(()=>{
+      const id='LCSO-'+Date.now().toString(36).toUpperCase()+'-'+Math.random().toString(36).slice(2,6).toUpperCase();
+      const data={id,created:new Date().toLocaleString('vi-VN'),hoten:draft.hoten,visa:draft.visa,status:'Đang chờ xét duyệt (Vui lòng chờ đợi khi hồ sơ có kết quả )'};
+      try {
+        const info=document.getElementById('resultInfo');info.replaceChildren();
+        for(const [label,value] of [['Mã hồ sơ',id],['Họ và tên',draft.hoten||'Chưa nhập'],['Diện visa',draft.visa||'Chưa nhập'],['Thời gian',data.created],['Trạng thái',data.status]]){
+          const line=document.createElement('div');const strong=document.createElement('strong');strong.textContent=label+': ';
+          line.append(strong,document.createTextNode(value));info.append(line);
+        }
+        document.getElementById('refText').textContent='';
+        sessionStorage.removeItem('visa_draft');
+        document.getElementById('result').hidden=false;
+      }catch(e){err.textContent='Không thể hiển thị thông tin hồ sơ. Vui lòng thử lại.';button.disabled=false;}
+      document.getElementById('submitLoading').hidden=true;
+    },2000);
   });
   document.getElementById('closeResult').onclick=()=>document.getElementById('result').hidden=true;
 </script>
@@ -205,15 +226,6 @@ input:focus{border-color:#00336f!important}
       }
     }, true);
 
-    // Ghi tên các tệp đã chọn vào bản ghi vừa được tạo; không thay đổi dữ liệu cũ.
-    submitButton.addEventListener('click', () => {
-      if (!assetInput.files.length) return;
-      const allRecords = records();
-      if (!allRecords.length) return;
-      allRecords[0].documents = allRecords[0].documents || {};
-      allRecords[0].documents.assets = Array.from(assetInput.files, file => file.name);
-      saveRecords(allRecords);
-    });
   })();
 </script></body>
 </html>
